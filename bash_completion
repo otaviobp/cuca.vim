@@ -1,0 +1,20 @@
+_cuca()
+{
+    local cur prev words cwords split
+    _init_completion -s || return
+    _get_comp_words_by_ref cur
+
+    COMPREPLY=()
+    COMP_WORDBREAKS=${COMP_WORDBREAKS//=}
+
+    BASH_COMPL="$(cuca bash-completion "${COMP_WORDS[@]}")"
+    if [[ $BASH_COMPL == "__FILES__" ]]; then
+        _filedir
+    else
+        COMPREPLY=( $( compgen -W "${BASH_COMPL}" -- "$cur" ) )
+
+    fi
+    return 0
+}
+
+complete -F _cuca cuca
