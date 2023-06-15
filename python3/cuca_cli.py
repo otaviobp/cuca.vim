@@ -2,7 +2,8 @@ import os
 import errno
 from collections.abc import Mapping
 
-from notebook import Notebook, NoteFixer
+from notebook import Notebook
+from note_fixer import NoteFixer
 from hook_list import HookList
 from cuca_gen import NoteHtmlGen
 from commands import CLICommander

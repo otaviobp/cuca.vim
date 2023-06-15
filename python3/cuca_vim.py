@@ -2,7 +2,8 @@ import vim  # type: ignore
 import os
 import cuca_utils
 
-from notebook import Notebook, NoteFixer
+from notebook import Notebook
+from note_fixer import NoteFixer
 from note import Note
 from cuca_gen import NoteHtmlGen
 
