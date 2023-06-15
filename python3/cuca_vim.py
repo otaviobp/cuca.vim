@@ -5,6 +5,7 @@ import cuca_utils
 from notebook import Notebook
 from note import Note
 from hook_list import HookList
+from config import Config
 
 notes_backlist = {}
 
@@ -115,8 +116,10 @@ def CucaOpenInBrowser():
 
 def CucaUpdateHook():
     note = Note(vim.current.buffer.name)
+    config = Config(Notebook.from_note(note))
     hooks = HookList().get_update_hooks_priority_list()
     for h in hooks:
-        h.update(note)
+        if config.get("hooks.update.{}.autorun".format(h.name()), False) == "True":
+            h.update(note)
 
     vim.command(":e")

@@ -1,0 +1,4 @@
+[hooks]
+update.html.autorun=True
+update.fix.autorun=True
+update.git-commit.autorun=True

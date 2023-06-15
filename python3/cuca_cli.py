@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from notebook import Notebook
 from hook_list import HookList
 from commands import CLICommander
+from config import Config
 
 
 class HookCLI(Mapping):
@@ -36,6 +37,7 @@ class CucaCLI:
     def __init__(self):
         self.notebook = Notebook()
         self.hook_list = HookList()
+        self.config = Config(self.notebook)
 
     def comfirm(self, prompt="Confirm?"):
         return input(prompt + " ").lower() == "y"
