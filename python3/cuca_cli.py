@@ -18,7 +18,7 @@ class HookCLI(Mapping):
         return lambda args: self.func(self.hooks[key], *args)
 
     def list(self):
-        for r in self.hooks:
+        for r in sorted(self.hooks.values()):
             print(r)
 
     def __len__(self):

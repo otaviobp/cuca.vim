@@ -2,6 +2,7 @@ from filter_hooks import FilterEmpty, FilterString, FilterUnreachable, FilterInv
 from hook import FilterHook, SearchHook, UpdateHook
 from search_hooks import SearchBrokenLinks, SearchWildUrlLinks, SearchUrlLinks
 from update_hooks import UpdateFix, UpdateHtml
+from hook_external import ExternalFilterHook, ExternalSearchHook, ExternalUpdateHook
 
 
 class HookList:
@@ -20,6 +21,11 @@ class HookList:
             UpdateFix(),
             UpdateHtml(),
         ]
+
+        # Look for user hooks
+        self.hooks += ExternalFilterHook.find_hooks_on_path()
+        self.hooks += ExternalSearchHook.find_hooks_on_path()
+        self.hooks += ExternalUpdateHook.find_hooks_on_path()
 
     def get_filter_hooks(self):
         return {x.name(): x for x in self.hooks if isinstance(x, FilterHook)}

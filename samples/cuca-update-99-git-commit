@@ -1,0 +1,15 @@
+#!/bin/bash
+# Update hook to commit last changes on notebook every 10 minutes
+
+dir=$(dirname $1)
+
+if [ -e "$dir/.git" ]; then
+    last_commit=$(git log -1 --format="%at")
+    timestamp=$(date "+%s")
+    if [ "$(($timestamp-$last_commit))" -gt "$((15*60))" ]; then
+        git add .
+        git commit -m "$(date)"
+    fi
+fi
+
+exit 1

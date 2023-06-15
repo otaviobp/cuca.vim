@@ -1,0 +1,6 @@
+#!/bin/bash
+# Sample search hook using grep
+
+file=$1
+shift
+grep -i "$@" $file

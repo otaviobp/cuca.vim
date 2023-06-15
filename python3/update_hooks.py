@@ -21,3 +21,6 @@ class UpdateHtml(UpdateHook):
         creator = HtmlCreator(Notebook.from_note(note))
         creator.save_note_html(note)
         return True
+
+    def priority(self):
+        return 60
