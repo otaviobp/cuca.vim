@@ -57,13 +57,13 @@ class CLICommander:
 
         args = args[1:-1]
         cmd = self.commands
-        while type(cmd) is dict and args:
+        while isinstance(cmd, Mapping) and args:
             if not args[0] in cmd:
                 return
             cmd = cmd[args[0]]
             args = args[1:]
 
-        if type(cmd) is not dict:
+        if not isinstance(cmd, Mapping):
             return
         print(" ".join(cmd.keys() - ["bash-completion"]))
 
