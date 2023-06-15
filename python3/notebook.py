@@ -37,25 +37,6 @@ class Notebook:
     def all_files(self):
         return [f for f in os.listdir(self.path) if not f.startswith(".") and f.endswith(Note.EXT)]
 
-    def unreachable_files(self):
-        all_files = set(self.all_files())
-        parser = NoteParser()
-        pending = [Notebook.INDEX_FILE]
-        reachable_files = set([Notebook.INDEX_FILE])
-
-        while len(pending) > 0:
-            f = pending.pop(0)
-            if Note.title_to_filename(f) not in all_files:
-                continue
-
-            for link in parser.parse_links(self.get_note(f).lines()):
-                link_filename = Note.title_to_filename(link)
-                if link_filename not in reachable_files:
-                    reachable_files.add(link_filename)
-                    pending.append(link_filename)
-
-        return all_files - reachable_files
-
     def empty_notes(self, files):
         empty = set()
         if len(files) == 0:

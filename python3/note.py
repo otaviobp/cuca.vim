@@ -1,4 +1,5 @@
 import os
+import functools
 
 # Naming conventions
 # title: Decorated title used on note (ex: 'Teste')
@@ -9,6 +10,7 @@ import os
 # path: Full path of the file
 
 
+@functools.total_ordering
 class Note:
     EXT = ".cuca"
     HEADER_SEP_CHAR = "="
@@ -48,6 +50,15 @@ class Note:
     def __init__(self, path):
         self.path = path
         self._lines = None
+
+    def __lt__(self, other):
+        return self.get_file_title() < other.get_file_title()
+
+    def __eq__(self, other):
+        return self.get_file_title() == other.get_file_title()
+
+    def __hash__(self):
+        return hash(self.get_file_title())
 
     def lines(self):
         if self._lines is None:
@@ -98,3 +109,6 @@ class Note:
             return False
 
         return True
+
+    def __str__(self):
+        return self.get_title()

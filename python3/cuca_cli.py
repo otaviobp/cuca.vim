@@ -1,25 +1,44 @@
 import os
 import errno
+from collections.abc import Mapping
 
 from notebook import Notebook, NoteFixer
+from hook_list import HookList
 from note_parser import NoteParser
 from note import Note
 from cuca_gen import NoteHtmlGen
 from commands import CLICommander
 
 
+class HookCLI(Mapping):
+    def __init__(self, func, hooks):
+        self.func = func
+        self.hooks = hooks
+
+    def __getitem__(self, key):
+        if key == "":
+            return self.list
+        return lambda args: self.func(self.hooks[key], *args)
+
+    def list(self):
+        for r in self.hooks:
+            print(r)
+
+    def __len__(self):
+        return len(self.hooks) + 1
+
+    def __iter__(self):
+        yield ""
+        yield from self.hooks.keys()
+
+    def __contains__(self, k):
+        return k == "" or k in self.hooks.keys()
+
+
 class CucaCLI:
     def __init__(self):
         self.notebook = Notebook()
-
-    def lint(self, args=[]):
-        files = args
-        if len(files) == 0:
-            files = self.notebook.all_files()
-
-        for f in files:
-            if not self.notebook.get_note(f).check_header():
-                print("Header invalid:", f)
+        self.hook_list = HookList()
 
     def fix(self, args=[]):
         files = args
@@ -75,38 +94,6 @@ class CucaCLI:
     def comfirm(self, prompt="Confirm?"):
         return input(prompt + " ").lower() == "y"
 
-    def remove_unreachable_files(self):
-        unreachable = self.notebook.unreachable_files()
-        if len(unreachable) == 0:
-            return
-
-        for l in sorted(unreachable):
-            print(l)
-        if self.comfirm("Remove unreachable files?"):
-            for i in unreachable:
-                os.unlink(self.notebook.get_note(i).path)
-
-    def unreachable_files(self, _):
-        for l in sorted(self.notebook.unreachable_files()):
-            print(l)
-
-    def remove_empty(self, args):
-        files = args
-        empty = self.notebook.empty_notes(files)
-        if len(empty) == 0:
-            return
-
-        for l in sorted(empty):
-            print(l)
-        if self.comfirm("Remove empty files?"):
-            for i in empty:
-                os.unlink(self.notebook.get_note(i).path)
-
-    def empty(self, args):
-        files = args
-        for l in sorted(self.notebook.empty_notes(files)):
-            print(l)
-
     def help(self, params):
         print("help message")
 
@@ -122,22 +109,33 @@ class CucaCLI:
             print("Error on creating a notebook in current directory")
             return errno.EFAULT
 
+    def filter_run(self, hook, *params):
+        for n in sorted(hook.filter(self.notebook.get_all_notes(), *params)):
+            print(n)
+
+    def filter_remove(self, hook, *params):
+        filtered_notes = sorted(hook.filter(self.notebook.get_all_notes(), *params))
+        if len(filtered_notes) == 0:
+            return
+
+        for n in filtered_notes:
+            print(n)
+
+        if self.comfirm("Remove files?"):
+            for n in filtered_notes:
+                os.unlink(n.path)
+
     def main(self, args):
         cmd = CLICommander(
             "cuca",
             {
                 "init": self.cuca_init,
-                "lint": self.lint,
+                "filter": HookCLI(self.filter_run, self.hook_list.get_filter_hooks()),
                 "fix": self.fix,
                 "html": self.generate_html,
                 "broken_links": self.broken_links,
                 "broken_links_complete": self.broken_links_complete,
-                "unreachable_files": self.unreachable_files,
-                "empty": self.empty,
-                "remove": {
-                    "unreachable_files": self.remove_unreachable_files,
-                    "empty": self.remove_empty,
-                },
+                "remove": HookCLI(self.filter_remove, self.hook_list.get_filter_hooks()),
             },
         )
 
