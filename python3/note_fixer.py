@@ -32,7 +32,7 @@ class NoteFixer:
         if len(self.note.lines()) == 2 or self.note.line(2) != "":
             self.note._lines.insert(2, "")
 
-    def __fix_heading_spacing(self):
+    def __fix_spacing_between_headers(self):
         i = 0
         while i < len(self.note._lines):
             l = self.note._lines[i]
@@ -52,19 +52,10 @@ class NoteFixer:
             i = i + 1
 
     def __fix_heading_promote(self):
-        def should_promote():
-            for x in self.note.lines():
-                if x.startswith("# "):
-                    return True
-            return False
-
-        if not should_promote():
-            return
-
         i = 0
         while i < len(self.note._lines):
             l = self.note._lines[i]
-            if l.startswith("#"):
+            if l.startswith("# "):
                 self.note._lines[i] = "#" + l
             i = i + 1
 
@@ -106,7 +97,7 @@ class NoteFixer:
     def fix_all(self):
         self.__fix_header()
         self.__fix_header_empty_line()
-        self.__fix_heading_spacing()
+        self.__fix_spacing_between_headers()
         self.__fix_heading_promote()
         self.__fix_wild_urls()
         self.__fix_wild_file_urls()
