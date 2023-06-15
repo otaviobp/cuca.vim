@@ -1,6 +1,7 @@
 from filter_hooks import FilterEmpty, FilterString, FilterUnreachable, FilterInvalidHeader
-from hook import FilterHook, SearchHook
+from hook import FilterHook, SearchHook, UpdateHook
 from search_hooks import SearchBrokenLinks, SearchWildUrlLinks, SearchUrlLinks
+from update_hooks import UpdateFix, UpdateHtml
 
 
 class HookList:
@@ -15,6 +16,9 @@ class HookList:
             SearchBrokenLinks(),
             SearchWildUrlLinks(),
             SearchUrlLinks(),
+            # Update
+            UpdateFix(),
+            UpdateHtml(),
         ]
 
     def get_filter_hooks(self):
@@ -22,3 +26,9 @@ class HookList:
 
     def get_search_hooks(self):
         return {x.name(): x for x in self.hooks if isinstance(x, SearchHook)}
+
+    def get_update_hooks(self):
+        return {x.name(): x for x in self.hooks if isinstance(x, UpdateHook)}
+
+    def get_update_hooks_priority_list(self):
+        return sorted([x for x in self.hooks if isinstance(x, UpdateHook)])

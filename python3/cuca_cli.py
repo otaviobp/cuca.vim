@@ -3,9 +3,7 @@ import errno
 from collections.abc import Mapping
 
 from notebook import Notebook
-from note_fixer import NoteFixer
 from hook_list import HookList
-from cuca_gen import NoteHtmlGen
 from commands import CLICommander
 
 
@@ -38,23 +36,6 @@ class CucaCLI:
     def __init__(self):
         self.notebook = Notebook()
         self.hook_list = HookList()
-
-    def fix(self, args=[]):
-        files = args
-        if len(files) == 0:
-            files = self.notebook.get_all_files()
-
-        for f in files:
-            NoteFixer(self.notebook.get_note(f)).fix_all()
-
-    def generate_html(self, args):
-        files = args
-        if len(files) == 0:
-            files = self.notebook.get_all_files()
-
-        gen = NoteHtmlGen(self.notebook)
-        for f in files:
-            gen.save_note_html(f)
 
     def comfirm(self, prompt="Confirm?"):
         return input(prompt + " ").lower() == "y"
@@ -99,6 +80,11 @@ class CucaCLI:
         for x in sorted(list(found)):
             print(x)
 
+    def update_run(self, hook, *params):
+        for n in self.notebook.get_all_notes():
+            r = hook.update(n, *params)
+            print('Update Hook {} on "{}": {}'.format(hook.name(), n, r))
+
     def search_notes_run(self, hook, *params):
         for n in self.notebook.get_all_notes():
             found = set()
@@ -121,8 +107,7 @@ class CucaCLI:
                 "filter": HookCLI(self.filter_run, self.hook_list.get_filter_hooks()),
                 "search": HookCLI(self.search_run, self.hook_list.get_search_hooks()),
                 "search_notes": HookCLI(self.search_notes_run, self.hook_list.get_search_hooks()),
-                "fix": self.fix,
-                "html": self.generate_html,
+                "update": HookCLI(self.update_run, self.hook_list.get_update_hooks()),
                 "remove": HookCLI(self.filter_remove, self.hook_list.get_filter_hooks()),
             },
         )

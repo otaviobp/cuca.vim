@@ -8,7 +8,7 @@ from note import Note
 import templates.css
 
 
-class NoteHtmlGen:
+class HtmlCreator:
     def __init__(self, notebook):
         self.notebook = notebook
         self.html_dir = self.notebook.cuca_data_dir("html")
@@ -20,12 +20,11 @@ class NoteHtmlGen:
         os.symlink("../imgs", os.path.join(self.html_dir, "imgs"))
         os.symlink("../files", os.path.join(self.html_dir, "files"))
 
-    def save_note_html(self, note_title):
+    def save_note_html(self, note):
         def create_link(match):
             title = match.group(1)
             return "[" + title + "](" + Note.sanitize_title(title) + ".html)"
 
-        note = self.notebook.get_note(note_title)
         pattern_links = NoteParser().pattern_links
 
         lines = note.lines()

@@ -9,8 +9,7 @@ command! -nargs=1 CucaAddURL python3 cuca_vim.CucaAddURL(<f-args>)
 command! -nargs=1 CucaAddFile python3 cuca_vim.CucaAddFile(<f-args>)
 command! CucaOpen python3 cuca_vim.CucaOpen()
 command! CucaBack python3 cuca_vim.CucaBack()
-command! CucaFix python3 cuca_vim.CucaFix()
-command! CucaCreateHTML python3 cuca_vim.CucaCreateHTML()
+command! CucaUpdateHook python3 cuca_vim.CucaUpdateHook()
 command! CucaOpenInBrowser python3 cuca_vim.CucaOpenInBrowser()
 
 " au BufNewFile,BufRead *.cuca  setf cuca
@@ -33,8 +32,7 @@ augroup CucaShortcut
     " <C-F>: Open note on browser
     autocmd FileType cuca nnoremap <buffer> <C-B> :CucaOpenInBrowser<CR>
 
-    " Generate HTML on save
-    autocmd BufWritePost *.cuca :CucaFix
-    autocmd BufWritePost *.cuca :CucaCreateHTML
+    " Run update hooks on save
+    autocmd BufWritePost *.cuca :CucaUpdateHook
 augroup END
 

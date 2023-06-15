@@ -2,6 +2,9 @@ from abc import abstractmethod, ABC
 
 
 class Hook(ABC):
+    def __lt__(self, other):
+        return self.name() < other.name()
+
     @abstractmethod
     def name(self):
         return ""

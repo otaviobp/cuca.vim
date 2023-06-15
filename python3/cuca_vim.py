@@ -3,9 +3,8 @@ import os
 import cuca_utils
 
 from notebook import Notebook
-from note_fixer import NoteFixer
 from note import Note
-from cuca_gen import NoteHtmlGen
+from hook_list import HookList
 
 notes_backlist = {}
 
@@ -105,24 +104,6 @@ def CucaBack():
         vim.command("edit {}".format(notes_backlist[rpath]))
 
 
-def CucaFix():
-    NoteFixer(Note(vim.current.buffer.name)).fix_all()
-    vim.command(":e")
-
-
-def CucaCreateHTML():
-    path = vim.current.buffer.name
-    if not os.path.exists(path):
-        return
-
-    notebook = Notebook(os.path.dirname(path))
-    if not notebook.is_init():
-        return
-
-    generator = NoteHtmlGen(notebook)
-    generator.save_note_html(Note(path).get_file_title())
-
-
 def CucaOpenInBrowser():
     notebook = Notebook(os.path.dirname(vim.current.buffer.name))
 
@@ -130,3 +111,12 @@ def CucaOpenInBrowser():
     html_dir = notebook.cuca_data_dir("html")
     html = os.path.join(html_dir, title + ".html")
     os.system("xdg-open file://{}".format(os.path.realpath(html)))
+
+
+def CucaUpdateHook():
+    note = Note(vim.current.buffer.name)
+    hooks = HookList().get_update_hooks_priority_list()
+    for h in hooks:
+        h.update(note)
+
+    vim.command(":e")
