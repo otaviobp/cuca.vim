@@ -3,7 +3,8 @@ import os
 import re
 import cuca_utils
 
-from cuca import NoteParser, Note
+from note_parser import NoteParser
+from note import Note
 import templates.css
 
 

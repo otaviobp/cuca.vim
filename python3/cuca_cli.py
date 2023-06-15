@@ -1,7 +1,9 @@
 import os
 import errno
 
-from cuca import Notebook, NoteParser, NoteFixer, Note
+from notebook import Notebook, NoteFixer
+from note_parser import NoteParser
+from note import Note
 from cuca_gen import NoteHtmlGen
 from commands import CLICommander
 
