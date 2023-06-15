@@ -41,8 +41,8 @@ class CLICommander:
             else:
                 return errno.EINVAL
 
-        if "" in self.commands:
-            return self.__call(self.commands[""], args[i + 1 :])
+        if "" in commands:
+            return self.__call(commands[""], args[i + 1 :])
 
         print(
             '{}: "{}" is not a valid {} command'.format(
