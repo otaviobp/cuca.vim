@@ -120,9 +120,6 @@ class CucaCLI:
             print("Error on creating a notebook in current directory")
             return errno.EFAULT
 
-    def bla(self, args):
-        print("run> ", args)
-
     def main(self, args):
         cmd = CLICommander(
             "cuca",
@@ -139,7 +136,6 @@ class CucaCLI:
                     "unreachable_files": self.remove_unreachable_files,
                     "empty": self.remove_empty,
                 },
-                "bla": self.bla,
             },
         )
 
