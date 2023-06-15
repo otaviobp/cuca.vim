@@ -34,13 +34,13 @@ class Notebook:
     def is_init(self):
         return os.path.isdir(self.cuca_data_dir())
 
-    def all_files(self):
+    def get_all_files(self):
         return [f for f in os.listdir(self.path) if not f.startswith(".") and f.endswith(Note.EXT)]
 
     def empty_notes(self, files):
         empty = set()
         if len(files) == 0:
-            files = self.all_files()
+            files = self.get_all_files()
 
         for f in files:
             n = self.get_note(f)
@@ -52,7 +52,7 @@ class Notebook:
         return Note(os.path.join(self.path, Note.title_to_filename(title)))
 
     def get_all_notes(self):
-        return [self.get_note(f) for f in self.all_files()]
+        return [self.get_note(f) for f in self.get_all_files()]
 
     def new_file(self, title):
         filename = Note.title_to_filename(title)
@@ -90,6 +90,10 @@ class Notebook:
         shutil.copy(path, dest)
 
         return dest, title
+
+    def contains(self, title):
+        path = os.path.join(self.path, Note.title_to_filename(title))
+        return os.path.exists(path)
 
 
 class NoteFixer:
@@ -181,11 +185,11 @@ class NoteFixer:
 
             return "[{}]({}){}".format(title, match.group(1), match.group(2))
 
-        pattern_url = NoteParser().pattern_url
+        pattern_wild_url = NoteParser().pattern_wild_url
 
         i = 0
         while i < len(self.note._lines):
-            self.note._lines[i] = re.sub(pattern_url, create_link_to_url, self.note._lines[i])
+            self.note._lines[i] = re.sub(pattern_wild_url, create_link_to_url, self.note._lines[i])
             i = i + 1
 
     def fix_all(self):
