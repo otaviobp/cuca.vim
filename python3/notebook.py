@@ -88,8 +88,9 @@ class Notebook(Mapping):
 
         return dest, title
 
-    def overwrite_note(self, note, content):
+    def overwrite_note(self, note, content, readonly=False):
         lines = [x + "\n" for x in content]
-        f = open(note._path, "w")
-        f.writelines(lines)
-        f.close()
+        if readonly:
+            cuca_utils.write_readonly_file(note.path(), lines)
+        else:
+            cuca_utils.write_file(note.path(), lines)

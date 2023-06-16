@@ -73,7 +73,7 @@ class NoteFixer:
 
             return "[{}]({}){}".format(title, dest, match.group(2))
 
-        pattern_file_url = NoteParser().pattern_file_url
+        pattern_file_url = NoteParser.patterns().pattern_file_url
 
         i = 0
         while i < len(self.lines):
@@ -86,7 +86,7 @@ class NoteFixer:
 
             return "[{}]({}){}".format(title, match.group(1), match.group(2))
 
-        pattern_wild_url = NoteParser().pattern_wild_url
+        pattern_wild_url = NoteParser.patterns().pattern_wild_url
 
         i = 0
         while i < len(self.lines):

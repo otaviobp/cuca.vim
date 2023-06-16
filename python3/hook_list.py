@@ -1,7 +1,7 @@
 from filter_hooks import FilterEmpty, FilterString, FilterUnreachable, FilterInvalidHeader
 from hook import FilterHook, SearchHook, UpdateHook
 from search_hooks import SearchBrokenLinks, SearchWildUrlLinks, SearchUrlLinks
-from update_hooks import UpdateFix, UpdateHtml
+from update_hooks import UpdateFix, UpdateHtml, UpdateTags, UpdateTagsBackpropagation
 from hook_external import ExternalFilterHook, ExternalSearchHook, ExternalUpdateHook
 
 
@@ -20,6 +20,8 @@ class HookList:
             # Update
             UpdateFix(),
             UpdateHtml(),
+            UpdateTags(),
+            UpdateTagsBackpropagation(),
         ]
 
         # Look for user hooks

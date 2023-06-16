@@ -25,7 +25,7 @@ class HtmlCreator:
             title = match.group(1)
             return "[" + title + "](" + Note.sanitize_title(title) + ".html)"
 
-        pattern_links = NoteParser().pattern_links
+        pattern_links = NoteParser.patterns().pattern_links
 
         lines = list(note.lines())
         i = 0

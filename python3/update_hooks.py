@@ -1,3 +1,4 @@
+from tag import TagProcessor
 from html_creator import HtmlCreator
 from notebook import Notebook
 from note_fixer import NoteFixer
@@ -24,3 +25,21 @@ class UpdateHtml(UpdateHook):
 
     def priority(self):
         return 60
+
+
+class UpdateTags(UpdateHook):
+    def name(self):
+        return "tags"
+
+    def update(self, note):
+        processor = TagProcessor()
+        return processor.update_tags(note)
+
+
+class UpdateTagsBackpropagation(UpdateHook):
+    def name(self):
+        return "tags_backpropagation"
+
+    def update(self, note):
+        processor = TagProcessor()
+        return processor.update_tags(note, backpropagation=True)
