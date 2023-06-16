@@ -8,6 +8,7 @@ class NoteParser:
         self.pattern_links = re.compile(r"\[(?P<link>.*?)\](?!\()")
         self.pattern_wild_url = re.compile(r"(http[s]?:[^\)]*?)(\s|$)")
         self.pattern_file_url = re.compile(r"file://([^\)]*)?(\s|$)")
+        self.pattern_headers = re.compile(r"#.*$")
 
     def parse_links(self, lines):
         for line in lines:
@@ -26,3 +27,8 @@ class NoteParser:
             for x in re.findall(self.pattern_link_url, line):
                 if x != "":
                     yield x
+
+    def parse_headers(self, lines):
+        for i, line in enumerate(lines):
+            if re.match(self.pattern_headers, line):
+                yield i

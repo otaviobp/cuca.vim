@@ -44,14 +44,13 @@ class ExternalFilterHook(FilterHook):
     def filter(self, notes, *params):
         # TODO: Set params on an ENV variable
 
-        note_files = [x.path for x in notes]
-        cmdline = [self.binary] + note_files
+        note_dict = {note.path(): note for note in notes}
+        cmdline = [self.binary] + list(note_dict.keys())
         ret = subprocess.run(cmdline, stdout=subprocess.PIPE)
         if ret.returncode != 0:
             yield from []
             return
 
-        note_dict = {note.path: note for note in notes}
         for file in ret.stdout.decode().split("\n"):
             if file in note_dict:
                 yield note_dict[file]
@@ -76,7 +75,7 @@ class ExternalSearchHook(SearchHook):
         return self.binpriority
 
     def search(self, note, *params):
-        cmdline = [self.binary, note.path] + list(params)
+        cmdline = [self.binary, note.path()] + list(params)
         ret = subprocess.run(cmdline, stdout=subprocess.PIPE)
         if ret.returncode != 0:
             yield from []
@@ -105,7 +104,7 @@ class ExternalUpdateHook(UpdateHook):
         return self.binpriority
 
     def update(self, note, *params):
-        cmdline = [self.binary, note.path] + list(params)
+        cmdline = [self.binary, note.path()] + list(params)
         ret = subprocess.run(cmdline, stdout=subprocess.PIPE)
         return ret.returncode == 0
 

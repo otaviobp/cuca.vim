@@ -27,7 +27,7 @@ class HtmlCreator:
 
         pattern_links = NoteParser().pattern_links
 
-        lines = note.lines()
+        lines = list(note.lines())
         i = 0
         while i < len(lines):
             lines[i] = re.sub(pattern_links, create_link, lines[i])
@@ -37,7 +37,7 @@ class HtmlCreator:
         html = markdown2.markdown(txt)
 
         # Save the file
-        path = os.path.join(self.html_dir, note.get_file_title() + ".html")
+        path = os.path.join(self.html_dir, note.key() + ".html")
         f = open(path, "w")
         f.writelines(["<html>", '<link rel="stylesheet" href="css.css">'])
         f.writelines(html)

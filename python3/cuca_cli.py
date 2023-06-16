@@ -58,11 +58,11 @@ class CucaCLI:
             return errno.EFAULT
 
     def filter_run(self, hook, *params):
-        for n in sorted(hook.filter(self.notebook.get_all_notes(), *params)):
+        for n in sorted(hook.filter(self.notebook.values(), *params)):
             print(n)
 
     def filter_remove(self, hook, *params):
-        filtered_notes = sorted(hook.filter(self.notebook.get_all_notes(), *params))
+        filtered_notes = sorted(hook.filter(self.notebook.values(), *params))
         if len(filtered_notes) == 0:
             return
 
@@ -71,11 +71,11 @@ class CucaCLI:
 
         if self.comfirm("Remove files?"):
             for n in filtered_notes:
-                os.unlink(n.path)
+                os.unlink(n.path())
 
     def search_run(self, hook, *params):
         found = set()
-        for n in self.notebook.get_all_notes():
+        for n in self.notebook.values():
             for x in hook.search(n, *params):
                 found.add(x)
 
@@ -83,12 +83,12 @@ class CucaCLI:
             print(x)
 
     def update_run(self, hook, *params):
-        for n in self.notebook.get_all_notes():
+        for n in self.notebook.values():
             r = hook.update(n, *params)
             print('Update Hook {} on "{}": {}'.format(hook.name(), n, r))
 
     def search_notes_run(self, hook, *params):
-        for n in self.notebook.get_all_notes():
+        for n in self.notebook.values():
             found = set()
             for x in hook.search(n, *params):
                 found.add(x)

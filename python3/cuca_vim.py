@@ -107,15 +107,17 @@ def CucaBack():
 
 def CucaOpenInBrowser():
     notebook = Notebook(os.path.dirname(vim.current.buffer.name))
+    key = Note.key_from_path(vim.current.buffer.name)
 
-    title = notebook.get_note(vim.current.buffer.name).get_file_title()
     html_dir = notebook.cuca_data_dir("html")
-    html = os.path.join(html_dir, title + ".html")
+    html = os.path.join(html_dir, key + ".html")
     os.system("xdg-open file://{}".format(os.path.realpath(html)))
 
 
 def CucaUpdateHook():
-    note = Note(vim.current.buffer.name)
+    dirname = os.path.dirname(vim.current.buffer.name)
+    title = Note.key_from_path(vim.current.buffer.name)
+    note = Note(dirname, title)
     config = Config(Notebook.from_note(note))
     hooks = HookList().get_update_hooks_priority_list()
     for h in hooks:

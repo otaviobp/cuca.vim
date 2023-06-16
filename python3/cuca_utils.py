@@ -52,6 +52,21 @@ def get_title_from_url(url):
     return title
 
 
+def write_readonly_file(path, content):
+    try:
+        os.unlink(path)
+    except FileNotFoundError:
+        pass
+
+    f = open(path, "w")
+    f.writelines(content)
+    f.close()
+
+    permissions = os.stat(path).st_mode
+    permissions &= ~0o222
+    os.chmod(path, permissions)
+
+
 def write_file(path, content):
     f = open(path, "w")
     f.writelines(content)

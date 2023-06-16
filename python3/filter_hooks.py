@@ -28,7 +28,7 @@ class FilterString(SimpleFilter):
     def filter_note(self, note, *params):
         s = " ".join(params).lower()
 
-        if s in note.get_title().lower():
+        if s in str(note).lower():
             return True
 
     def name(self):
@@ -44,10 +44,10 @@ class FilterUnreachable(FilterHook):
             yield from []
             return
 
-        notebook = Notebook.from_note(notes[0])
+        notebook = Notebook.from_note(next(iter(notes)))
         all_notes = set(notes)
-        reachable = set((notebook.get_note(Notebook.INDEX_FILE),))
-        pending = [notebook.get_note(Notebook.INDEX_FILE)]
+        reachable = set([notebook[Notebook.INDEX]])
+        pending = [notebook[Notebook.INDEX]]
         parser = NoteParser()
 
         while len(pending) > 0:
@@ -56,7 +56,7 @@ class FilterUnreachable(FilterHook):
                 continue
 
             for link in parser.parse_links(note.lines()):
-                link_note = notebook.get_note(link)
+                link_note = notebook[link]
                 if link_note not in reachable:
                     reachable.add(link_note)
                     pending.append(link_note)

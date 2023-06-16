@@ -10,53 +10,55 @@ from note_parser import NoteParser
 class NoteFixer:
     def __init__(self, note):
         self.note = note
+        self.notebook = Notebook.from_note(note)
+        self.lines = list(note.lines())
 
     def __fix_header(self):
         # If header is valid
         if (
-            len(self.note.lines()) >= 2
-            and len(self.note.line(1)) > 0
-            and self.note.line(1) == Note.header_sep(len(self.note.line(1)))
+            len(self.lines) >= 2
+            and len(self.lines[1]) > 0
+            and self.lines[1] == Note.header_sep(len(self.lines[1]))
         ):
-            if self.note.get_sanitized_title() != self.note.get_file_title():
-                self.note._lines[0] = self.note.get_file_title_decorated()
-            if self.note.line(1) != Note.header_sep(len(self.note.line(0))):
-                self.note._lines[1] = Note.header_sep(len(self.note.line(0)))
+            if Note.sanitize_title(self.note.get_header_title()) != self.note.key():
+                self.lines[0] = Note.decorate_title(self.note.key())
+            if self.lines[1] != Note.header_sep(len(self.lines[0])):
+                self.lines[1] = Note.header_sep(len(self.lines[0]))
             return
 
-        if self.note.get_sanitized_title() != self.note.get_file_title():
-            self.note._lines.insert(0, self.note.get_file_title_decorated())
-        self.note._lines.insert(1, Note.header_sep(len(self.note.line(0))))
+        if Note.sanitize_title(self.note.get_header_title()) != self.note.key():
+            self.lines.insert(0, Note.decorate_title(self.note.key()))
+        self.lines.insert(1, Note.header_sep(len(self.lines[0])))
 
     def __fix_header_empty_line(self):
-        if len(self.note.lines()) == 2 or self.note.line(2) != "":
-            self.note._lines.insert(2, "")
+        if len(self.lines) == 2 or self.lines[2] != "":
+            self.lines.insert(2, "")
 
     def __fix_spacing_between_headers(self):
         i = 0
-        while i < len(self.note._lines):
-            l = self.note._lines[i]
+        while i < len(self.lines):
+            l = self.lines[i]
             if l.startswith("#"):
                 index = cuca_utils.index_not_char(l, "#")
                 if index < len(l) and l[index] != " ":
-                    self.note._lines[i] = l[:index] + " " + l[index:]
+                    self.lines[i] = l[:index] + " " + l[index:]
 
                 # Needs to add line breaks
-                if self.note._lines[i - 1] != "":
-                    self.note._lines.insert(i, "")
+                if self.lines[i - 1] != "":
+                    self.lines.insert(i, "")
                     i = i + 1
 
-                if i + 1 < len(self.note._lines) and self.note._lines[i + 1] != "":
-                    self.note._lines.insert(i + 1, "")
+                if i + 1 < len(self.lines) and self.lines[i + 1] != "":
+                    self.lines.insert(i + 1, "")
 
             i = i + 1
 
     def __fix_heading_promote(self):
         i = 0
-        while i < len(self.note._lines):
-            l = self.note._lines[i]
+        while i < len(self.lines):
+            l = self.lines[i]
             if l.startswith("# "):
-                self.note._lines[i] = "#" + l
+                self.lines[i] = "#" + l
             i = i + 1
 
     def __fix_wild_file_urls(self):
@@ -64,8 +66,7 @@ class NoteFixer:
             title = os.path.splitext(os.path.basename(match.group(1)))[0]
             title = Note.decorate_title(title)
 
-            notebook = Notebook.from_note(self.note)
-            dest, title = notebook.add_file(match.group(1), title)
+            dest, title = self.notebook.add_file(match.group(1), title)
             basedir = os.path.basename(os.path.dirname(dest))
             basename = os.path.basename(dest)
             dest = os.path.join(basedir, basename)
@@ -75,10 +76,8 @@ class NoteFixer:
         pattern_file_url = NoteParser().pattern_file_url
 
         i = 0
-        while i < len(self.note._lines):
-            self.note._lines[i] = re.sub(
-                pattern_file_url, create_link_to_file_url, self.note._lines[i]
-            )
+        while i < len(self.lines):
+            self.lines[i] = re.sub(pattern_file_url, create_link_to_file_url, self.lines[i])
             i = i + 1
 
     def __fix_wild_urls(self):
@@ -90,8 +89,8 @@ class NoteFixer:
         pattern_wild_url = NoteParser().pattern_wild_url
 
         i = 0
-        while i < len(self.note._lines):
-            self.note._lines[i] = re.sub(pattern_wild_url, create_link_to_url, self.note._lines[i])
+        while i < len(self.lines):
+            self.lines[i] = re.sub(pattern_wild_url, create_link_to_url, self.lines[i])
             i = i + 1
 
     def fix_all(self):
@@ -102,8 +101,5 @@ class NoteFixer:
         self.__fix_wild_urls()
         self.__fix_wild_file_urls()
 
-        # Save File
-        lines = [x + "\n" for x in self.note.lines()]
-        f2 = open(self.note.path, "w")
-        f2.writelines(lines)
-        f2.close()
+        if "\n".join(self.lines) != "\n".join(self.note.lines()):
+            self.notebook.overwrite_note(self.note, self.lines)

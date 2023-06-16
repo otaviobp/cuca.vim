@@ -11,7 +11,7 @@ class SearchBrokenLinks(SearchHook):
         notebook = Notebook.from_note(note)
         parser = NoteParser()
         for l in parser.parse_links(note.lines()):
-            if not notebook.contains(l):
+            if l not in notebook:
                 yield (l)
 
 
