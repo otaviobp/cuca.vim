@@ -26,7 +26,10 @@ class NoteFixer:
                 self.lines[1] = Note.header_sep(len(self.lines[0]))
             return
 
-        if Note.sanitize_title(self.note.get_header_title()) != self.note.key():
+        if (
+            len(self.lines) == 0
+            or Note.sanitize_title(self.note.get_header_title()) != self.note.key()
+        ):
             self.lines.insert(0, Note.decorate_title(self.note.key()))
         self.lines.insert(1, Note.header_sep(len(self.lines[0])))
 
